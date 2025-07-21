@@ -1,0 +1,3 @@
+2025-07-18 16:17:36 | INFO | Initializing url_rewriter_content_request_worker worker with PID 22900
+2025-07-18 16:17:36 | INFO | Successfully connected on attempt 1
+2025-07-18 16:17:36 | INFO | url_rewriter_content_request_worker initialized and ready to process messages

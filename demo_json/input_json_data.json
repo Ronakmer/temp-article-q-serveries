@@ -1,0 +1,86 @@
+{
+    "success": true,
+    "data": [
+        {
+            "id": 17,
+            "article_id": "f05df4c8-7af8-48f1-8e2f-a43fd92aaed5",
+            "input_json_data": {
+                "message": {
+                    "url": "https://topmovierankings.com/bigg-boss/ayesha-khan-biography",
+                    "domain": {
+                        "name": "ronak-wolf.botxbyte.com",
+                        "slug_id": "25fca9b7-d9a3-42b9-be7b-eadf062716d6",
+                        "permalinks": "/%year%/%hour%/%postname%/"
+                    },
+                    "prompt": {
+                        "name": "URL Rewriter By content",
+                        "slug_id": "ef02ddc0-4e32-4688-8981-2474549264fe",
+                        "prompt_data": {
+                            "content_title": "rewrite title using this given this [[primary_keyword]] and the title is : [[source_title]].",
+                            "content_rephrase": "Give the content in html format including h1 to h6 and p, bold, and formmating paragraphs. Now, rewrite this content including the primary keyword as [[primary_keyword]] in introduction and headings, excluding the title for the content : [[source_content]] The output must be in JSON format like this: [[output]]"
+                        },
+                        "article_type": {
+                            "title": "Url Rewriter By content",
+                            "slug_id": "2dd493f4-4fb2-4183-9d5e-424d0e00e720",
+                            "category": "url",
+                            "description": "Url Rewriter By content",
+                            "article_category": "rephrase",
+                            "article_type_field": [
+                                {
+                                    "name": "content_rephrase",
+                                    "type": "textarea",
+                                    "label": "content_rephrase",
+                                    "slug_id": "e78e9121-57a5-479f-88c2-bf4f4f4e533a",
+                                    "required": true,
+                                    "placeholder": "content_rephrase"
+                                }
+                            ]
+                        },
+                        "ai_rate_model": "deepseek/deepseek_v3",
+                        "supportive_prompt_json_data": {
+                            "supportive_prompt_wp_tags_selected_by_ai_id": "bb57a0a2-65d3-4330-bbb9-6d1ad4c15b49",
+                            "supportive_prompt_wp_tags_generated_by_ai_id": "223c6a85-2962-443a-ac58-1b40ecc197d6",
+                            "supportive_prompt_wp_authors_selected_by_ai_id": "1e943c84-3eb5-4a4e-8c67-c63d2e38e64b",
+                            "supportive_prompt_meta_title_generated_by_ai_id": "071f19b7-6668-4cff-92a7-40dd8c80dfbd",
+                            "supportive_prompt_wp_authors_generated_by_ai_id": "ebe74136-40c6-4d82-a90e-dbef69c2159f",
+                            "supportive_prompt_wp_categories_selected_by_ai_id": "5fbcef44-c403-48f3-b48d-fc8097c6ab60",
+                            "supportive_prompt_meta_keywords_generated_by_ai_id": "288031a0-83d4-4fbb-904b-1e2761e888eb",
+                            "supportive_prompt_wp_categories_generated_by_ai_id": "c1018168-b4a6-47b3-b1f5-f19ed706718b",
+                            "supportive_prompt_primary_keyword_generated_by_ai_id": "d61d2528-4856-4421-aecd-8c2c96be85aa",
+                            "supportive_prompt_meta_description_generated_by_ai_id": "71937c7a-0f47-4869-9604-02c98236a33c"
+                        }
+                    },
+                    "wp_tag": [
+                        "358568af-ff45-40ec-b42c-f01982846f15"
+                    ],
+                    "workspace": {
+                        "name": "bxb-1",
+                        "slug_id": "57dc902e-4449-4083-9b56-328eb9d16334"
+                    },
+                    "wp_author": "289d879c-6225-40b5-96fa-d970fef30add",
+                    "wp_status": "publish",
+                    "wp_category": [
+                        "bcc00477-6ba7-40cd-9641-6d1e67905bf7"
+                    ],
+                    "article_status": "initiate",
+                    "article_slug_id": "f05df4c8-7af8-48f1-8e2f-a43fd92aaed5",
+                    "ai_content_flags": {
+                        "is_wp_tags_selected_by_ai": false,
+                        "is_wp_tags_generated_by_ai": false,
+                        "is_wp_authors_selected_by_ai": false,
+                        "is_meta_title_generated_by_ai": false,
+                        "is_wp_authors_generated_by_ai": false,
+                        "is_wp_categories_selected_by_ai": false,
+                        "is_meta_keywords_generated_by_ai": false,
+                        "is_wp_categories_generated_by_ai": false,
+                        "is_primary_keyword_generated_by_ai": true,
+                        "is_meta_description_generated_by_ai": false
+                    },
+                    "article_priority": 200,
+                    "wp_schedule_time": null
+                }
+            }
+        }
+    ],
+    "status_code": 200
+}

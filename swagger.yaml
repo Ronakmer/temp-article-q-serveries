@@ -1,0 +1,413 @@
+openapi: 3.0.0
+info:
+  title: RabbitMQ Flask Service API
+  description: API for managing RabbitMQ queues and workers
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:5000
+tags:
+  - name: Queue API
+    description: Operations related to queues
+  - name: Worker API
+    description: Operations related to workers
+  - name: Logs API
+    description: Operations related to logging
+
+paths:
+  /queue/list:
+    get:
+      tags:
+        - Queue API
+      summary: List all queues and their workers
+      responses:
+        '200':
+          description: A list of queues and their workers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: connected
+                  queue_count:
+                    type: integer
+                  queues:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        messages:
+                          type: integer
+                        messages_ready:
+                          type: integer
+                        messages_unacknowledged:
+                          type: integer
+                        worker_count:
+                          type: integer
+                        workers:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              consumer_tag:
+                                type: string
+                              channel_details:
+                                type: object
+                              connection_details:
+                                type: object
+                              pid:
+                                type: integer
+                              worker_pid:
+                                type: integer
+
+  /queue/create:
+    post:
+      tags:
+        - Queue API
+      summary: Create a new queue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                queue_name:
+                  type: string
+      responses:
+        '201':
+          description: Queue created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Queue 'my_queue' created successfully
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /queue/publish/{queue_name}:
+    post:
+      tags:
+        - Queue API
+      summary: Publish a message to a specific queue
+      parameters:
+        - name: queue_name
+          in: path
+          required: true
+          description: Name of the queue
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+      responses:
+        '200':
+          description: Message published successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  queue:
+                    type: string
+                  worker_name:
+                    type: string
+                  domain:
+                    type: string
+                  task_id:
+                    type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /queue/clear/{queue_name}:
+    post:
+      tags:
+        - Queue API
+      summary: Clear a specific queue
+      parameters:
+        - name: queue_name
+          in: path
+          required: true
+          description: Name of the queue
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Queue cleared successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  queue_name:
+                    type: string
+                  messages_removed:
+                    type: integer
+                  workers_stopped:
+                    type: integer
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /queue/delete/{queue_name}:
+    delete:
+      tags:
+        - Queue API
+      summary: Delete a specific queue
+      parameters:
+        - name: queue_name
+          in: path
+          required: true
+          description: Name of the queue to delete
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Queue deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Queue 'my_queue' deleted successfully
+        '404':
+          description: Queue not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /worker/workers:
+    post:
+      tags:
+        - Worker API
+      summary: Find workers for a specific queue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                queue_name:
+                  type: string
+      responses:
+        '200':
+          description: List of workers for the specified queue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  queue_name:
+                    type: string
+                  worker_count:
+                    type: integer
+                  workers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        consumer_tag:
+                          type: string
+                        channel_details:
+                          type: object
+                        connection_details:
+                          type: object
+                        log_file:
+                          type: object
+                          properties:
+                            static_url:
+                              type: string
+                            full_url:
+                              type: string
+                            view_url:
+                              type: string
+                        ip_address:
+                          type: string
+                        pid:
+                          type: integer
+
+  /worker/scale/{queue_name}:
+    post:
+      tags:
+        - Worker API
+      summary: Scale the number of workers for a queue
+      parameters:
+        - name: queue_name
+          in: path
+          required: true
+          description: Name of the queue to scale
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                worker_name:
+                  type: string
+                count:
+                  type: integer
+      responses:
+        '200':
+          description: Workers scaled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  queue_name:
+                    type: string
+                  worker_name:
+                    type: string
+                  previous_count:
+                    type: integer
+                  current_count:
+                    type: integer
+                  target_count:
+                    type: integer
+                  workers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        consumer_tag:
+                          type: string
+                        channel:
+                          type: string
+                        connection:
+                          type: string
+                        pid:
+                          type: integer
+                        worker_status:
+                          type: string
+                  workers_added:
+                    type: integer
+                  workers_removed:
+                    type: integer
+                  status:
+                    type: string
+                  success:
+                    type: boolean
+
+  /logs/workers/logs/{pid}:
+    get:
+      tags:
+        - Logs API
+      summary: Retrieve logs for a specific worker process
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: PID of the worker
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Logs retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pid:
+                    type: integer
+                  log_file:
+                    type: string
+                  lines:
+                    type: array
+                    items:
+                      type: string
+        '404':
+          description: Log file not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /logs/workers/view-logs/{pid}:
+    get:
+      tags:
+        - Logs API
+      summary: Render the log viewer page for a specific worker process
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: PID of the worker
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Log viewer page rendered successfully
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /static/{file_name}:
+    get:
+      tags:
+        - Logs API
+      summary: Serve static files
+      parameters:
+        - name: file_name
+          in: path
+          required: true
+          description: Name of the static file to serve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Static file served successfully
+          content:
+            application/octet-stream:
+              schema:
+                type: string

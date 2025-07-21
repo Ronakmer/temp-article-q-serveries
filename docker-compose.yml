@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    ports:
+      - "8503:8501"
+    networks:
+      - rabbitmq_shared_network
+      - flask_django_net     
+    volumes:
+      - .:/app
+    env_file:
+      - .env.docker
+
+networks:
+  rabbitmq_shared_network:
+    external: true
+
+  flask_django_net:           
+    external: true

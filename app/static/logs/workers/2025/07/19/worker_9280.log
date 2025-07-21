@@ -1,0 +1,3 @@
+2025-07-19 16:06:19 | INFO | Initializing url_rewriter_content_request_worker worker with PID 9280
+2025-07-19 16:06:19 | INFO | Successfully connected on attempt 1
+2025-07-19 16:06:19 | INFO | url_rewriter_content_request_worker initialized and ready to process messages

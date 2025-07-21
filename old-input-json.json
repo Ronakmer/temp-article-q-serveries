@@ -1,0 +1,51 @@
+{
+    "message": {
+        "articl_slug_id": "4f79ba74-84cc-43ec-bc4f-000000000001",
+        "prompt_id": {
+        "slug_id": "4f79ba74-84cc-43ec-bc4f-000000000002",
+        "article_type_id": {
+            "slug_id": "4f79ba74-84cc-43ec-bc4f-000000000003",
+            "article_type_field_id": [
+            {
+                "slug_id": "4f79ba74-84cc-43ec-bc4f-000000000004",
+                "name": "text-box",
+                "label": "rewrite_para",
+                "placeholder": "Enter Rewriting Paragraph Text",
+                "field_type": "textbox",
+                "required": true
+            }
+            ],
+            "name": "URL Rewriter By Para",
+            "category": "url",
+            "article_type_image": "https://ik.imagekit.io/botxbyte/img_NVrtcD34Y.png",
+            "article_category": "rephraser",
+            "title": "Url Rewriter By Para",
+            "description": "This prompt helps rewriting the paragraph."
+        },
+        "name": "[URL Rewriter By Para]First",
+        "prompt_data": {
+            "system_rephrase": "I need you to make this content more engaging for a user, no fluff, remove cringe, increase the humour levels where appropriate but not throughout the content, increase explanations where relevant based on your most up to date understanding of the parent and primary topics.\n\nFocus on the emotion, vocabulary, tone and optimization of the article, break standard English rules via idioms, slang and even a regional tone if necessary, remove overly technical terms or jargon. Improve the article for a user to engage and buy, increase active tone, add personal touch, personal stories, specific use cases and experience whilst still maintaining standards related to the Google algorithm, helpful content system and product reviews system.\n\nFocus on sentence structure that makes it easy to semantically connect entities, then focus on choosing the most human entity and smooth transitions between topics, sentences and paragraphs.\nReWrite for and as a human, use natural, conversational dialogue and use stemming, lemmatization, n-grams and zipf's law.",
+            "title_rephrase": "Rewrite the title:",
+            "heading_rephrase": "Rewrite the heading:",
+            "para_rephrase": "Rewrite the para:",
+            "table_rephrase": "Rewrite the table:",
+            "blockquote_rephrase": "Rewrite the Blockquote:",
+            "list_rephrase": "Rewrite the list:"
+        },
+        "model": "gpt-4"
+        },
+        "domain_id": {
+        "slug_id": "4f79ba74-84cc-43ec-bc4f-000000000005",
+        "name": "https://ronak-wolf.botxbyte.com/",
+        "permalinks": "/months/year/day"
+        },
+        "workspace": {
+        "slug_id": "4f79ba74-84cc-43ec-bc4f-000000000006"
+        },
+        "url": "https://topmovierankings.com/web-series/demands-for-side-hustlers-season-2",
+        "url_slug_id": "test-12345678",
+        "wp_status": "publish",
+        "article_status": "success",
+        "wp_schedule_time": "2024-12-01T10:00:00Z"
+    }
+}
