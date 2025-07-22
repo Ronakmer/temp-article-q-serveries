@@ -17,6 +17,8 @@ import json
 from app.workers.core.article_innovator_api_call.ai_message.ai_message import AIMessage
 from app.workers.core.ai_rate_limiter.ai_rate_limiter import AIRateLimiter
 from app.workers.url_rewriter_content_helpers.publish_article import PublishArticle
+from app.workers.core.article_innovator_api_call.fetch_supportive_prompt.fetch_supportive_prompt import FetchSupportivePrompt
+from app.workers.url_rewriter_content_helpers.ai_rate_limiter_request import AIRateLimiterService
 from app.config.config import AI_RATE_LIMITER_URL
 
 class UrlRewriterParallelWorker(BaseWorker):
@@ -45,6 +47,8 @@ class UrlRewriterParallelWorker(BaseWorker):
         # self.add_category_service = AddCategory()
         # self.create_wp_base_prompt_service = CreateWpBasePrompt()
         self.publish_article_service = PublishArticle()
+        self.fetch_supportive_prompt_service = FetchSupportivePrompt()
+        self.ai_rate_limiter_service = AIRateLimiterService()
         
         self.ai_message_service = AIMessage()
         
@@ -130,6 +134,20 @@ class UrlRewriterParallelWorker(BaseWorker):
             print(article_message_count,'article_message_count')
 
 
+
+            try:
+                get_input_json_data = self.ai_message_service.get_input_json_data_to_article_innovator(data)
+                # print(get_input_json_data, '----------------------get_input_json_data----------------------')
+            except Exception as e:
+                print({"status": "error", "step": "get_input_json_data", "message": str(e)})
+
+            input_data = get_input_json_data.get("data", [])[0].get("input_json_data", {}).get("message", {})
+            ai_flags = input_data.get("ai_content_flags", {})
+            support_ids = input_data.get("prompt", {}).get("supportive_prompt_json_data", {})
+            domain_slug_id = input_data.get("domain", {}).get("slug_id", {})
+            workspace_slug_id = input_data.get("workspace", {}).get("slug_id", {})
+
+
             # # ✅ Only proceed if both are set and equal
             if (
                 article_message_count is not None and
@@ -149,40 +167,100 @@ class UrlRewriterParallelWorker(BaseWorker):
                     print({"status": "error", "step": "get_all_stored_content_message", "message": str(e)})
 
 
-                # try:
-                #     # get_input_json_data = self.get_input_json_service.get_input_json_data(data)
-                #     get_input_json_data = self.ai_message_service.get_input_json_data_to_article_innovator(data)
-                #     # print(get_input_json_data, '----------------------get_input_json_data----------------------')
-                # except Exception as e:
-                #     print({"status": "error", "step": "get_input_json_data", "message": str(e)})
 
-                # input_data = get_input_json_data.get("data", [])[0].get("input_json_data", {}).get("message", {})
-                # ai_flags = input_data.get("ai_content_flags", {})
-                # support_ids = input_data.get("prompt", {}).get("supportive_prompt_json_data", {})
-                # domain_slug_id = input_data.get("domain", {}).get("slug_id", {})
-                # workspace_slug_id = input_data.get("workspace", {}).get("slug_id", {})
+                if ai_flags.get("is_wp_categories_selected_by_ai", False):
+                    supportive_prompt_data = {}     
+                    create_single_ai_request_data = None   
+                    ai_response_json = None   
+                    try:
+                        # Step 4: get supportive_prompt data from Article Innovator                    
+                        category_id = support_ids.get("supportive_prompt_wp_categories_selected_by_ai_id")
+                        supportive_prompt_data = self.fetch_supportive_prompt_service.fetch_supportive_prompt(supportive_prompts_slug_id=category_id,domain_slug_id=domain_slug_id)
+                        print(supportive_prompt_data, '----------------------supportive_prompt_data----------------------')
+                    except Exception as e:
+                        print({"status": "error", "step": "fetch_supportive_prompt", "message": str(e)})
+                        # return {"status": "error", "step": "fetch_supportive_prompt", "message": str(e)}
+
+
+                    try:
+                        wp_category_base_prompt = self.ai_rate_limiter_service.create_single_wp_ai_request(input_data, supportive_prompt_data, all_stored_message_data, 'category')
+                        print(wp_category_base_prompt, '----------------------wp_category_base_prompt----------------------')
+                    except Exception as e:
+                        print({"status": "error", "step": "create_wp_base_prompt", "message": str(e)})
+
+
+                    try:
+                        send_single_ai_request_data = self.ai_rate_limiter_service.send_ai_request(wp_category_base_prompt, workspace_slug_id)
+                        print(send_single_ai_request_data, '----------------------send_single_ai_request_data----------------------')
+                    except Exception as e:
+                        print({"status": "error", "step": "store_or_send_prompt", "message": str(e)})
+                        
+                        
+                        
+                if ai_flags.get("is_wp_categories_generated_by_ai", False):
+                    supportive_prompt_data = {}     
+                    create_single_ai_request_data = None   
+                    ai_response_json = None   
+                    try:
+                        # Step 4: get supportive_prompt data from Article Innovator                    
+                        category_id = support_ids.get("supportive_prompt_wp_categories_generated_by_ai_id")
+                        supportive_prompt_data = self.fetch_supportive_prompt_service.fetch_supportive_prompt(supportive_prompts_slug_id=category_id,domain_slug_id=domain_slug_id)
+                        print(supportive_prompt_data, '----------------------supportive_prompt_data----------------------')
+                    except Exception as e:
+                        print({"status": "error", "step": "fetch_supportive_prompt", "message": str(e)})
+                        # return {"status": "error", "step": "fetch_supportive_prompt", "message": str(e)}
+
+
+                    try:
+                        wp_category_base_prompt = self.ai_rate_limiter_service.create_single_wp_ai_request(input_data, supportive_prompt_data, all_stored_message_data, 'category')
+                        print(wp_category_base_prompt, '----------------------wp_category_base_prompt----------------------')
+                    except Exception as e:
+                        print({"status": "error", "step": "create_wp_base_prompt", "message": str(e)})
+
+
+                    try:
+                        send_single_ai_request_data = self.ai_rate_limiter_service.send_ai_request(wp_category_base_prompt, workspace_slug_id)
+                        print(send_single_ai_request_data, '----------------------send_single_ai_request_data----------------------')
+                    except Exception as e:
+                        print({"status": "error", "step": "store_or_send_prompt", "message": str(e)})
 
 
 
+
+            # if message_field_type != "content_message" and message_field_type != "primary_keyword":
+            if ( any(ai_flags.values()) and message_field_type not in ("content_message", "primary_keyword")):
+
+                all_stored_wp_message_data = None
+                
                 try:
-                    publish_article_datas = self.publish_article_service.publish_article(all_stored_message_data, article_id)
-                    print(publish_article_datas, '----------------------publish_article_service----------------------')
+                    all_stored_wp_message_data = self.ai_message_service.get_all_stored_wp_message(article_id)
+                    print(all_stored_wp_message_data, '----------------------all_stored_wp_message_data----------------------')
                 except Exception as e:
-                    print({"status": "error", "step": "format_article_content", "message": str(e)})
+                    print({"status": "error", "step": "get_all_stored_wp_message", "message": str(e)})
+
+
+
+                if all_stored_wp_message_data['total_messages'] == all_stored_wp_message_data['total_successful_messages']:
+                    # print("----------------------All messages are successful!----------------------")
+                    all_stored_content_message_data= None
+
+                    try:
+                        all_stored_content_message_data = self.ai_message_service.get_all_stored_content_message(article_id, 'content_message')
+                    except Exception as e:
+                        print({"status": "error", "step": "get_all_stored_content_message", "message": str(e)})
+
+
+
+                    try:
+                        publish_article_datas = self.publish_article_service.publish_article(all_stored_content_message_data, all_stored_wp_message_data, article_id)
+                        print(publish_article_datas, '----------------------publish_article_service----------------------')
+                    except Exception as e:
+                        print({"status": "error", "step": "format_article_content", "message": str(e)})
 
 
 
 
-            # # if message_field_type != "content_message" and message_field_type != "primary_keyword_generated_by_ai":
-            #     # get all message using artical id [content_message, primary_keyword_generated_by_ai ] ---->> aa bane nay leva nu 
-            #     all_stored_wp_message_data = None
-            #     # try:
-            #     #     all_stored_wp_message_data = self.get_all_stored_message_service.get_all_stored_wp_message(
-            #     #         article_id)
-            #     #     print(all_stored_wp_message_data, '----------------------all_stored_wp_message_data----------------------')
 
-            #     # except Exception as e:
-            #     #     print({"status": "error", "step": "get_all_stored_wp_message", "message": str(e)})
 
 
             #     try:

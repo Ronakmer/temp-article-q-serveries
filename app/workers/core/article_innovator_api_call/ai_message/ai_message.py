@@ -187,6 +187,7 @@ class AIMessage:
 
             ai_response = message_data.get("ai_response", {})
             ai_response_status = message_data.get("ai_response_status")
+            message_field_type = message_data.get("message_field_type")
 
             # Helper: detect failure
             def is_failure(status):
@@ -224,8 +225,8 @@ class AIMessage:
 
                 # ✅ Increment retry count
                 retry_count += 1
-                base_priority = self.calculate_priority_service.extract_base_priority(message_priority, 'content_message')
-                priority = self.calculate_priority_service.calculate_priority(base_priority, 'retry_content_message')
+                base_priority = self.calculate_priority_service.extract_base_priority(message_priority, message_field_type)
+                priority = self.calculate_priority_service.calculate_priority(base_priority, f'retry_{message_field_type}')
 
                 if retry_count > message_retry_count:
                     return {
@@ -387,3 +388,32 @@ class AIMessage:
             return {"success": False, "error": f"Unexpected error: {str(e)}"}
 
 
+
+    def get_all_stored_wp_message(self, article_id):
+        try:
+            params = {
+                'article_slug_id': article_id,
+                'publish_article': 'true',
+            }
+
+            response = self.api_client.crud('ai-message', 'read', params=params)
+
+            if response.get("success") and isinstance(response.get("data"), list):
+                all_messages = response["data"]
+                successful_messages = [m for m in all_messages if m.get("ai_response_status") == "success"]
+
+                # Save all messages to file
+                os.makedirs('demo_json', exist_ok=True)
+                with open('demo_json/final_all_wp_message_data.json', 'w', encoding='utf-8') as f:
+                    json.dump(response, f, indent=4)
+
+                return {
+                    "success": True,
+                    "total_messages": len(all_messages),
+                    "total_successful_messages": len(successful_messages),
+                    "data": successful_messages
+                }
+
+            return {"success": False, "message": "No data found"}
+        except Exception as e:
+            return {"success": False, "message": str(e)}

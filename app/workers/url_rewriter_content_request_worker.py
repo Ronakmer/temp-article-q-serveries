@@ -169,10 +169,10 @@ class UrlRewriterParallelWorker(BaseWorker):
 
                 try:
                     # Step 4: Get AI response
-                    create_single_ai_request_data = self.ai_rate_limiter_service.create_single_ai_request(data, supportive_prompt_data, processed_data)
+                    create_single_ai_request_data = self.ai_rate_limiter_service.create_single_primary_keyword_ai_request(data, supportive_prompt_data, processed_data)
                     # print(create_single_ai_request_data,'----------------------create_single_ai_request_data----------------------')
                 except Exception as e:
-                    print({"status": "error", "step": "create_single_ai_request", "message": str(e)})
+                    print({"status": "error", "step": "create_single_primary_keyword_ai_request", "message": str(e)})
                     # return {"status": "error", "step": "send_ai_request", "message": str(e)}
 
 

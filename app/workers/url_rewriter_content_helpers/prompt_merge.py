@@ -15,164 +15,6 @@ class FinalPromptCreator:
         self.content_processor_service = ContentProcessor()
 
 
-    # def final_prompt_creator(self, base_prompt_data, scraped_data):
-    #     try:
-    #         print('enter final_prompt_creator')
-    #         # print(base_prompt_data,'base_prompt_dataxx')
-           
-    #         create_selector_map_data = self._create_selector_map(scraped_data)
-    #         # print(create_selector_map_data,'create_selector_map_dataxxx')
-
-    #         # ✅ Dump directly as JSON object (not string)
-
-    #         with open('demo_json/create_selector_map_data.json', 'w', encoding='utf-8') as f:
-    #             json.dump(create_selector_map_data, f, ensure_ascii=False, indent=4)
-
-
-            
-            
-    #         processed_data = self.content_processor_service.process_content(create_selector_map_data)
-    #         # processed_data = self.process_content(create_selector_map_data)
-
-    #         # ✅ Dump directly as JSON object (not string)
-    #         with open('demo_json/processed_data.json', 'w', encoding='utf-8') as f:
-    #             json.dump(processed_data, f, ensure_ascii=False, indent=4)
-
-
-    #         # print(processed_data,'processed_data')
-    #         prompt_val = None
-    #         try:
-    #             prompt_val = base_prompt_data['base_prompt_data'][0]['data']['updated_prompt_data']['content_rephrase']
-    #         except:
-    #             prompt_val = base_prompt_data["content_rephrase"]
-
-            
-    #         # Merge base prompt with extracted data
-    #         final_data = self.merge_prompt_data(prompt_val, processed_data)
-    #         # print(final_data, 'final_merged_prompt_data')
-
-    #         # Return the updated prompt data
-    #         return {
-    #             "success": True,
-    #             "updated_prompt_data": final_data,
-    #         }
-
-    #     except Exception as e:
-    #         error_msg = f"An unexpected error occurred: {str(e)}"
-    #         print(f"Exception: {error_msg}")
-    #         return {"success": False, "error": error_msg}
-
-
-
-
-    # def _create_selector_map(self, scraped_data):
-    #     """Create selector map from scraped data."""
-    #     selector_map = {}
-        
-    #     try:
-    #         # Get processed content data from ContentProcessor
-    #         fetch_content_data = self.content_processor_service.fetch_content(scraped_data)
-    #         # print(f"Fetched content data: {fetch_content_data}")
-            
-    #         if not fetch_content_data:
-    #             print("Warning: No fetch_content_data returned from ContentProcessor")
-    #             # Fallback to original scraped_data
-    #             data_to_process = scraped_data
-    #         else:
-    #             # Use the processed content data
-    #             data_to_process = fetch_content_data
-            
-    #         if not data_to_process:
-    #             print("Warning: No data to process")
-    #             return selector_map
-
-    #         if 'selectors_output' in data_to_process:
-    #             # Handle selectors_output format
-    #             selectors_output = data_to_process['selectors_output']
-    #             if isinstance(selectors_output, list):
-    #                 selector_map = {item['name']: item['value'] for item in selectors_output if isinstance(item, dict) and 'name' in item and 'value' in item}
-    #             else:
-    #                 print("Warning: selectors_output is not a list")
-    #         else:
-    #             # Dynamically extract all keys that start with 'source_'
-    #             selector_map = {key: value for key, value in data_to_process.items() if isinstance(key, str) and key.startswith('source_')}
-                
-    #         # Optional: Print what was found for debugging
-    #         if selector_map:
-    #             print(f"Found selector keys: {list(selector_map.keys())}")
-    #         else:
-    #             print("Warning: No selector data found in processed data")
-                
-    #     except Exception as e:
-    #         print(f"Error creating selector_map: {e}")
-            
-    #     return selector_map
-
-
-
-    # def merge_prompt_data(self, base_prompt_data, processed_data):
-    #     """
-    #     Merge base prompt instructions with content and title.
-    #     """
-    #     final_prompt = {
-    #         # "instruction": base_prompt_data.strip() if isinstance(base_prompt_data, str) else str(base_prompt_data),
-    #         "instruction": base_prompt_data,
-    #         "title": processed_data.get("title", ""),
-    #         "content": processed_data.get("content", "")
-    #     }
-    #     return final_prompt
-
-
-
-
-
-
-
-
-
-
-   
-
-    # def merge_prompt_data(self, base_prompt_data, processed_data, fetch_content_data, get_single_ai_response_data=None):
-    #     """
-    #     Merge base prompt instructions with content and title.
-    #     """
-        
-    #     if get_single_ai_response_data is not None:
-    #         primary_keyword = self._extract_primary_keyword(get_single_ai_response_data)
-
-        
-        
-    #     prompt_data = self._extract_prompt_data(base_prompt_data)
-    #     print(prompt_data,'prompt_datasdfsdfsdfsdfsdfsdfsdf')
-
-    #     # prompt_val = None
-    #     # try:
-    #     #     prompt_val = base_prompt_data['base_prompt_data'][0]['data']['updated_prompt_data']['content_rephrase']
-    #     # except:
-    #     #     prompt_val = base_prompt_data["content_rephrase"]
-
-
-
-    #     final_prompt = {
-    #         # "instruction": base_prompt_data.strip() if isinstance(base_prompt_data, str) else str(base_prompt_data),
-    #         "instruction": prompt_data,
-    #         "source_title": processed_data.get("source_title", ""),
-    #         "source_content": processed_data.get("source_content", "")
-    #     }
-        
-        
-    #     # print(final_prompt,'final_promptsdfsdfsdfsdfsdf')
-        
-    #     return final_prompt
-
-
-
-
-
-
-
-
     def merge_prompt_data(self, base_prompt_data, processed_data, fetch_content_data, get_single_ai_response_data=None):
         """
         Merge base prompt instructions with content and title.
@@ -221,7 +63,6 @@ class FinalPromptCreator:
         
 
         return final_prompt
-
 
 
 
@@ -283,13 +124,7 @@ class FinalPromptCreator:
             return ''
         
         
-        
-    # def _extract_prompt_data(self, base_prompt_data):
-    #     """Extract prompt data from base_prompt_data with fallback."""
-    #     try:
-    #         return base_prompt_data['base_prompt_data'][0]['data']['updated_prompt_data']['content_rephrase']
-    #     except (KeyError, IndexError, TypeError):
-    #         return base_prompt_data.get('content_rephrase')
+
     
 
     def _extract_prompt_data(self, base_prompt_data):

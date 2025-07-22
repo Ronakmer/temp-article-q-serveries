@@ -8,6 +8,7 @@ from app.workers.core.calculate_priority.calculate_priority import CalculatePrio
 from app.workers.core.article_innovator_api_call.ai_message.ai_message import AIMessage
 from app.workers.core.ai_rate_limiter.ai_rate_limiter import AIRateLimiter
 from app.workers.core.primary_keyword_mapping.primary_keyword_mapping import PrimaryKeywordMapping
+from app.workers.core.wp_data_mapping.wp_data_mapping import WPDataMapping
 from app.config.config import AI_RATE_LIMITER_URL
 
 
@@ -22,6 +23,7 @@ class AIRateLimiterService:
         self.ai_rate_limiter_service = AIRateLimiter()
         self.ai_message_service = AIMessage()
         self.primary_keyword_mapping_service = PrimaryKeywordMapping()
+        self.wp_data_mapping_service = WPDataMapping()
 
 
     
@@ -104,7 +106,7 @@ class AIRateLimiterService:
 
         
    
-    def create_single_ai_request(self, input_json_data, request_data, processed_data):     
+    def create_single_primary_keyword_ai_request(self, input_json_data, request_data, processed_data):     
         
         try:
             # Extract updated_text from supportive prompts
@@ -113,15 +115,15 @@ class AIRateLimiterService:
                 for item in request_data.get('supportive_prompts', [])
                 if 'data' in item and 'updated_text' in item['data']
             ]
-            print(data_list, 'data_listxxxxxxxxxx')
+            # print(data_list, 'data_listxxxxxxxxxx')
 
             # Create prompt
             prompt_data = self.primary_keyword_mapping_service.primary_keyword_mapping(data_list, processed_data)
-            print(prompt_data, 'prompt_dataxxxxxxxxxx')
+            # print(prompt_data, 'prompt_dataxxxxxxxxxx')
             # Set priority
             article_priority = input_json_data.get("message", {}).get("article_priority", 100)
             priority = self.calculate_priority_service.calculate_priority(article_priority, 'primary_keyword')
-            print(priority, 'priorityxxxxxxxxxx')
+            # print(priority, 'priorityxxxxxxxxxx')
 
             # Metadata
             workspace_obj = input_json_data.get("message", {}).get("workspace", {})
@@ -134,7 +136,7 @@ class AIRateLimiterService:
             message_id = str(uuid.uuid4())  # default new UUID
 
             try:
-                stored_message_data = self.ai_message_service.check_if_prompt_already_stored(article_id, 'primary_keyword_generated_by_ai')
+                stored_message_data = self.ai_message_service.check_if_prompt_already_stored(article_id, 'primary_keyword')
                 # print(stored_message_data, 'stored_message_dataxxxxxxxxxx')
                 if stored_message_data.get("success") and stored_message_data.get("data"):
                     # Use the existing message_id
@@ -155,7 +157,7 @@ class AIRateLimiterService:
                 "article_message_total_count": 1,
                 "prompt": prompt_data,
                 "ai_request_status": 'sent',
-                "message_field_type": 'primary_keyword_generated_by_ai',
+                "message_field_type": 'primary_keyword',
                 "message_priority": priority,
                 "content": "",
                 "workspace_id": workspace_slug_id,
@@ -176,9 +178,90 @@ class AIRateLimiterService:
             return single_ai_request
 
         except requests.RequestException as e:
+            return f"Request to create_single_primary_keyword_ai_request failed: {e}"
+        except Exception as e:
+            return f"An unexpected error occurred: {e}"
+        
+        
+        
+    def create_single_wp_ai_request(self, input_json_data, request_data, all_stored_message, message_type):     
+        try:
+            # Extract updated_text from supportive prompts
+            data_list = [
+                item['data']['updated_text']
+                for item in request_data.get('supportive_prompts', [])
+                if 'data' in item and 'updated_text' in item['data']
+            ]
+            # print(data_list, 'data_listxxxxxxxxxx')
+
+            # Create prompt
+            prompt_data = self.wp_data_mapping_service.wp_data_mapping(data_list, all_stored_message)
+            print(prompt_data, 'prompt_dataxxxxxxxxxx')
+            # Set priority
+            article_priority = input_json_data.get("article_priority", 100)
+            priority = self.calculate_priority_service.calculate_priority(article_priority, message_type)
+            print(priority, 'priorityxxxxxxxxxx')
+
+            print(input_json_data, 'input_json_datasssssssssssssssseeeeeeeeeeeeeeee')
+            # Metadata
+            workspace_obj = input_json_data.get("workspace", {})
+            workspace_slug_id = workspace_obj.get("slug_id", "")
+            print(workspace_slug_id,'workspace_slug_idxxxxxxxxxx')
+            
+            prompt_obj = input_json_data.get("prompt", {})
+            ai_model = prompt_obj.get("ai_rate_model", 'deepseek/deepseek_v3')
+            article_id = input_json_data.get("article_slug_id")
+
+            # Try to get existing message data
+            message_id = str(uuid.uuid4())  # default new UUID
+
+            try:
+                stored_message_data = self.ai_message_service.check_if_prompt_already_stored(article_id, message_type)
+                # print(stored_message_data, 'stored_message_dataxxxxxxxxxx')
+                if stored_message_data.get("success") and stored_message_data.get("data"):
+                    # Use the existing message_id
+                    message_id = stored_message_data["data"][0].get("message_id", message_id)
+                    print(message_id, 'message_idxxxxxxxxxx')
+            except Exception as e:
+                print({"status": "error", "step": "get_stored_message", "message": str(e)})
+
+            # Build AI request
+            single_ai_request = {
+                "article_id": article_id,
+                "model": ai_model,
+                "system_prompt": "You are a helpful assistant.",
+                "sequence_index": 1,
+                "html_tag": "",
+                "response_format": "json",
+                "message_id": message_id,
+                "article_message_total_count": 1,
+                "prompt": prompt_data,
+                "ai_request_status": 'sent',
+                "message_field_type": message_type,
+                "message_priority": priority,
+                "content": "",
+                "workspace_id": workspace_slug_id,
+            }
+            print(single_ai_request, 'single_ai_requestxxxxxxxsdfsdfsdfsdfsdfxxx')
+
+            # Step 4.2: Store AI message request
+            try:
+                self.ai_message_service.store_ai_message_request(single_ai_request)
+            except Exception as e:
+                error_msg = f"Error storing AI message request: {str(e)}"
+                print({"status": "error", "step": "store_ai_message_request", "message": error_msg})
+                return {
+                    "success": False,
+                    "error": error_msg,
+                    "message_id": single_ai_request.get("message_id")
+                }
+            return single_ai_request
+
+        except requests.RequestException as e:
             return f"Request to ai lambda failed: {e}"
         except Exception as e:
             return f"An unexpected error occurred: {e}"
+        
         
         
 

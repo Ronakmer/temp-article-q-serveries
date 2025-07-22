@@ -37,6 +37,9 @@ class CalculatePriority:
     DATA_WEIGHTS = {
         'content_message': 1,
         'retry_content_message': 2,
+        'retry_category': 2,
+        'retry_tag': 2,
+        'retry_author': 2,
         'category': 3,
         'tag': 3,
         'author': 3,

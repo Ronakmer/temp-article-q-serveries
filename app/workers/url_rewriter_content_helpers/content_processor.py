@@ -7,59 +7,6 @@ import requests
 
 class ContentProcessor:
 
-    # def fetch_content(self, scraper_data, sleep_time=5):
-    #     """
-    #     Fetch content from the URL returned by the scraper API
-        
-    #     Args:
-    #         scraper_data (dict): The response from the scraper API
-            
-    #     Returns:
-    #         dict: The content data or None if failed
-    #     """
-        
-    #     # print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-    #     # Extract public URL from response
-    #     response_obj = scraper_data.get('response', {})
-    #     public_url = response_obj.get('public_url')        
-
-    #     self.sleep_time = sleep_time
-
-    #     if not public_url:
-    #         print("Error: No public URL found in scraper response")
-    #         return None
-            
-    #     # Give S3 some time to make the file available (if configured)
-    #     if self.sleep_time > 0:
-    #         time.sleep(self.sleep_time)
-        
-    #     # print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@22')
-    #     try:
-    #         # Download content
-    #         content_response = requests.get(public_url)
-            
-    #         if content_response.status_code != 200:
-    #             print(f"Error: Failed to fetch content, status code {content_response.status_code}")
-    #             return None
-                
-    #         # print(content_response.json(),'&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
-    #         # Parse content
-            
-    #         temp_data = content_response.json()
-    #         # ✅ Dump directly as JSON object (not string)
-    #         with open('demo_json/content_response.json', 'w', encoding='utf-8') as f:
-    #             json.dump(temp_data, f, ensure_ascii=False, indent=4)
-   
-    #         try:
-    #             return content_response.json()
-    #         except json.JSONDecodeError:
-    #             return content_response.text
-                
-    #     except Exception as e:
-    #         print(f"Error fetching content: {e}")
-    #         return None 
-    
-
     def __init__(self, sleep_time=5):
         self.sleep_time = sleep_time
         
@@ -139,12 +86,9 @@ class ContentProcessor:
                 elif selector.get('name') == 'source_title':
                     title_value = selector.get('value')
 
-
-
             # # Directly extract values from content_data
             # content_html = content_data.get('source_content', None) if content_data else None
             # title_value = content_data.get('source_title', None) if content_data else None
-
 
 
             # # Create processed data dictionary

@@ -6,7 +6,7 @@
             "article_id": "f05df4c8-7af8-48f1-8e2f-a43fd92aaed5",
             "input_json_data": {
                 "message": {
-                    "url": "https://topmovierankings.com/bigg-boss/ayesha-khan-biography",
+                    "url": "https://ronak-wolf.botxbyte.com/2025/06/demands-for-side-hustlers-season-2-is-it-officially-renewed-everything-you-need-to-know/",
                     "domain": {
                         "name": "ronak-wolf.botxbyte.com",
                         "slug_id": "25fca9b7-d9a3-42b9-be7b-eadf062716d6",
@@ -59,9 +59,7 @@
                     },
                     "wp_author": "289d879c-6225-40b5-96fa-d970fef30add",
                     "wp_status": "publish",
-                    "wp_category": [
-                        "bcc00477-6ba7-40cd-9641-6d1e67905bf7"
-                    ],
+                    "wp_category": [],
                     "article_status": "initiate",
                     "article_slug_id": "f05df4c8-7af8-48f1-8e2f-a43fd92aaed5",
                     "ai_content_flags": {
@@ -72,7 +70,7 @@
                         "is_wp_authors_generated_by_ai": false,
                         "is_wp_categories_selected_by_ai": false,
                         "is_meta_keywords_generated_by_ai": false,
-                        "is_wp_categories_generated_by_ai": false,
+                        "is_wp_categories_generated_by_ai": true,
                         "is_primary_keyword_generated_by_ai": true,
                         "is_meta_description_generated_by_ai": false
                     },
