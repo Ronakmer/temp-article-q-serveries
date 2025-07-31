@@ -26,7 +26,8 @@ class ContentProcessor:
 
         if not public_url:
             print("❌ Error: No public URL found in scraper response")
-            return None
+            raise ValueError("❌ Error: No public URL found in scraper response")
+            # return None
 
         # Wait for S3 to make file available
         if self.sleep_time > 0:
@@ -37,7 +38,8 @@ class ContentProcessor:
 
             if content_response.status_code != 200:
                 print(f"❌ Error: Failed to fetch content, status code {content_response.status_code}")
-                return None
+                raise ValueError(f"❌ Error: Failed to fetch content, status code {content_response.status_code}")
+                # return None
 
             # Load JSON from response
             data = content_response.json()
@@ -55,7 +57,8 @@ class ContentProcessor:
 
         except Exception as e:
             print(f"❌ Error fetching or parsing content: {e}")
-            return None
+            raise ValueError(f"❌ Error fetching or parsing content: {e}")
+            # return None
 
 
     def clean_html(self, raw_html):
@@ -109,4 +112,4 @@ class ContentProcessor:
         except Exception as e:
             # Log or handle the error
             print(f"[process_content] Error: {e}")
-            return {"error": str(e)}
+            raise ValueError(f"[process_content] Error: {e}")

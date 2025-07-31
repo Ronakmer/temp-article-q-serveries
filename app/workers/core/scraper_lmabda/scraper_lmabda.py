@@ -24,7 +24,7 @@ class ArticleScraperService:
             # print("get_scraped_article_data Response Body:", response.json())
 
             if response.status_code != 200:
-                return f"Scraped Lambda returned an error: {response.status_code} - {response.text}"
+                raise ValueError(f"Scraped Lambda returned an error: {response.status_code} - {response.text}")
 
             # return_data = self.ai_rate_limiter_service.fetch_and_process_content(response.json(), input_json_data)
 
@@ -32,9 +32,11 @@ class ArticleScraperService:
             return response_data
 
         except requests.RequestException as e:
-            return f"Request to scraped lambda failed: {e}"
+            # return f"Request to scraped lambda failed: {e}"
+            raise ValueError(f"Request to scraped lambda failed: {e}")
         except Exception as e:
-            return f"An unexpected error occurred: {e}"
+            # return f"An unexpected error occurred: {e}"
+            raise ValueError(f"An unexpected error occurred: {e}")
 
 
 

@@ -17,7 +17,7 @@ class ArticleSelectorService:
             url = f'{self.selector_lambda_url}/selectors'
 
             if not self.selector_lambda_url:
-                return "Selector Lambda URL is not found"
+                raise ValueError("Selector Lambda URL is not found")
 
             data = {
                 "url": target_url
@@ -29,7 +29,8 @@ class ArticleSelectorService:
             # print("get_selectors Response Body:", response.json())
 
             if response.status_code != 200:
-                return f"Selector Lambda returned an error: {response.status_code} - {response.text}"
+                # return f"Selector Lambda returned an error: {response.status_code} - {response.text}"
+                raise ValueError(f"Selector Lambda returned an error: {response.status_code} - {response.text}")
 
             response_data = response.json()
             return response_data
@@ -37,6 +38,8 @@ class ArticleSelectorService:
             # self.scraper_service.get_scraped_article_data(response.json(), input_json_data)
 
         except requests.RequestException as e:
-            return f"Request to selector lambda failed: {e}"
+            # return f"Request to selector lambda failed: {e}"
+            raise ValueError(f"Request to selector lambda failed: {e}")
         except Exception as e:
-            return f"An unexpected error occurred: {e}"
+            # return f"An unexpected error occurred: {e}"
+            raise ValueError(f"An unexpected error occurred: {e}")

@@ -2,11 +2,11 @@
     "success": true,
     "data": [
         {
-            "id": 17,
-            "article_id": "f05df4c8-7af8-48f1-8e2f-a43fd92aaed5",
+            "id": 82,
+            "article_id": "b7bcced9-02a2-46e5-925c-8d525485950f",
             "input_json_data": {
                 "message": {
-                    "url": "https://ronak-wolf.botxbyte.com/2025/06/demands-for-side-hustlers-season-2-is-it-officially-renewed-everything-you-need-to-know/",
+                    "url": "https://topmovierankings.com/web-series/blue-lights-season-4-premiere-date",
                     "domain": {
                         "name": "ronak-wolf.botxbyte.com",
                         "slug_id": "25fca9b7-d9a3-42b9-be7b-eadf062716d6",
@@ -33,6 +33,14 @@
                                     "slug_id": "e78e9121-57a5-479f-88c2-bf4f4f4e533a",
                                     "required": true,
                                     "placeholder": "content_rephrase"
+                                },
+                                {
+                                    "name": "content_title",
+                                    "type": "textarea",
+                                    "label": "content_title",
+                                    "slug_id": "275fc3c9-cc51-4814-93a3-10201107e793",
+                                    "required": true,
+                                    "placeholder": "content_title"
                                 }
                             ]
                         },
@@ -57,11 +65,13 @@
                         "name": "bxb-1",
                         "slug_id": "57dc902e-4449-4083-9b56-328eb9d16334"
                     },
-                    "wp_author": "289d879c-6225-40b5-96fa-d970fef30add",
-                    "wp_status": "publish",
-                    "wp_category": [],
+                    "wp_author": "af0a67b2-6b35-46b2-8aa0-003d84c12834",
+                    "wp_status": "draft",
+                    "wp_category": [
+                        "9aaf2d14-552e-4a34-b94e-0619ed59e63d"
+                    ],
                     "article_status": "initiate",
-                    "article_slug_id": "f05df4c8-7af8-48f1-8e2f-a43fd92aaed5",
+                    "article_slug_id": "b7bcced9-02a2-46e5-925c-8d525485950f",
                     "ai_content_flags": {
                         "is_wp_tags_selected_by_ai": false,
                         "is_wp_tags_generated_by_ai": false,
@@ -70,7 +80,7 @@
                         "is_wp_authors_generated_by_ai": false,
                         "is_wp_categories_selected_by_ai": false,
                         "is_meta_keywords_generated_by_ai": false,
-                        "is_wp_categories_generated_by_ai": true,
+                        "is_wp_categories_generated_by_ai": false,
                         "is_primary_keyword_generated_by_ai": true,
                         "is_meta_description_generated_by_ai": false
                     },

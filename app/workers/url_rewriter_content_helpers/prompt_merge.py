@@ -16,53 +16,57 @@ class FinalPromptCreator:
 
 
     def merge_prompt_data(self, base_prompt_data, processed_data, fetch_content_data, get_single_ai_response_data=None):
-        """
-        Merge base prompt instructions with content and title.
-        """
-        primary_keyword = ""
-        # if get_single_ai_response_data is not None:
-        #     primary_keyword = self._extract_primary_keyword(self, get_single_ai_response_data)
+        try:
+            """
+            Merge base prompt instructions with content and title.
+            """
+            primary_keyword = ""
+            # if get_single_ai_response_data is not None:
+            #     primary_keyword = self._extract_primary_keyword(self, get_single_ai_response_data)
 
-        # # Extract prompt data
-        # prompt_data = self._extract_prompt_data(self, base_prompt_data)
-        # print(prompt_data, 'prompt_datasdfsdfsdfsdfsdfsdfsdf')
+            # # Extract prompt data
+            # prompt_data = self._extract_prompt_data(self, base_prompt_data)
+            # print(prompt_data, 'prompt_datasdfsdfsdfsdfsdfsdfsdf')
 
-        # # Replace [[primary_keyword]] everywhere in prompt_data
-        # if primary_keyword:
-        #     prompt_data = self._replace_primary_keyword(self, prompt_data, primary_keyword)
+            # # Replace [[primary_keyword]] everywhere in prompt_data
+            # if primary_keyword:
+            #     prompt_data = self._replace_primary_keyword(self, prompt_data, primary_keyword)
 
 
-        # merged_prompt = self._replace_prompt_placeholders(self, prompt_data, processed_data)
-        
-        primary_keyword = self._extract_primary_keyword(get_single_ai_response_data)
-        template_data = self._extract_prompt_data(base_prompt_data)
+            # merged_prompt = self._replace_prompt_placeholders(self, prompt_data, processed_data)
+            
+            primary_keyword = self._extract_primary_keyword(get_single_ai_response_data)
+            template_data = self._extract_prompt_data(base_prompt_data)
 
-        if primary_keyword:
-            prompt_with_keyword = self._replace_primary_keyword(template_data, primary_keyword)
-        else:
-            prompt_with_keyword = template_data
+            if primary_keyword:
+                prompt_with_keyword = self._replace_primary_keyword(template_data, primary_keyword)
+            else:
+                prompt_with_keyword = template_data
 
-        merged_prompt = self._replace_prompt_placeholders(prompt_with_keyword, processed_data)
-        # print(merged_prompt, 'merged_prompt_datssdfsdfsdfa')
+            merged_prompt = self._replace_prompt_placeholders(prompt_with_keyword, processed_data)
+            # print(merged_prompt, 'merged_prompt_datssdfsdfsdfa')
 
-        # Convert all string values in merged_prompt into one final string
-        final_text_parts = []
-        for key, value in merged_prompt.items():
-            if isinstance(value, str):
-                final_text_parts.append(value)
+            # Convert all string values in merged_prompt into one final string
+            final_text_parts = []
+            for key, value in merged_prompt.items():
+                if isinstance(value, str):
+                    final_text_parts.append(value)
 
-        # Join all prompt sections into one final string
-        final_prompt = "\n\n".join(final_text_parts)
+            # Join all prompt sections into one final string
+            final_prompt = "\n\n".join(final_text_parts)
 
-        # Remove extra spaces, tabs, and newlines
-        final_prompt = re.sub(r'\s+', ' ', final_prompt).strip()
-        
-        
-        print(final_prompt, 'final_prompt_datssdfsdfsdfa')        
-        
-        
+            # Remove extra spaces, tabs, and newlines
+            final_prompt = re.sub(r'\s+', ' ', final_prompt).strip()
+            
+            
+            print(final_prompt, 'final_prompt_datssdfsdfsdfa')        
+            
+            
 
-        return final_prompt
+            return final_prompt
+        except ValueError as e:
+            # print(f"ValueError in _extract_primary_keyword: {e}")
+            raise ValueError(f"error in merge_prompt_data:{e}")
 
 
 

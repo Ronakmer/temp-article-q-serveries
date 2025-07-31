@@ -71,5 +71,6 @@ class FetchSupportivePrompt:
                 if attempt < max_retries:
                     time.sleep(delay)
 
-        return {"error": f"Failed after {max_retries} attempts: {last_exception}"}
+        # return {"error": f"Failed after {max_retries} attempts: {last_exception}"}
+        raise ValueError(f"Failed after {max_retries} attempts: {last_exception}")
 

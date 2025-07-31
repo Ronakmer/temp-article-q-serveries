@@ -53,7 +53,8 @@ class AIRateLimiterService:
                     message_id = stored_message_data["data"][0].get("message_id", message_id)
                     print(message_id, 'message_idxxxxxxxxxx')
             except Exception as e:
-                print({"status": "error", "step": "get_stored_message", "message": str(e)})
+                # print({"status": "error", "step": "get_stored_message", "message": str(e)})
+                raise ValueError({"status": "error", "step": "get_stored_message", "message": str(e)})
 
             print(final_prompt_data,'final_prompt_data')
             # combined_text = (
@@ -100,9 +101,11 @@ class AIRateLimiterService:
             return single_ai_request
 
         except requests.RequestException as e:
-            return f"Request to ai lambda failed: {e}"
+            # return f"Request to ai lambda failed: {e}"
+            raise ValueError(f"error in create_content_ai_request: {e}")
         except Exception as e:
-            return f"An unexpected error occurred: {e}"
+            # return f"An unexpected error occurred: {e}"
+            raise ValueError(f"An unexpected error occurred: {e}")
 
         
    
@@ -143,7 +146,8 @@ class AIRateLimiterService:
                     message_id = stored_message_data["data"][0].get("message_id", message_id)
                     print(message_id, 'message_idxxxxxxxxxx')
             except Exception as e:
-                print({"status": "error", "step": "get_stored_message", "message": str(e)})
+                # print({"status": "error", "step": "get_stored_message", "message": str(e)})
+                raise ValueError({"status": "error", "step": "get_stored_message", "message": str(e)})
 
             # Build AI request
             single_ai_request = {
@@ -178,9 +182,10 @@ class AIRateLimiterService:
             return single_ai_request
 
         except requests.RequestException as e:
-            return f"Request to create_single_primary_keyword_ai_request failed: {e}"
+            # return f"Request to create_single_primary_keyword_ai_request failed: {e}"
+            raise ValueError(f"Request to create_single_primary_keyword_ai_request failed: {e}")
         except Exception as e:
-            return f"An unexpected error occurred: {e}"
+            raise ValueError(f"An unexpected error occurred: {e}")
         
         
         
@@ -223,7 +228,8 @@ class AIRateLimiterService:
                     message_id = stored_message_data["data"][0].get("message_id", message_id)
                     print(message_id, 'message_idxxxxxxxxxx')
             except Exception as e:
-                print({"status": "error", "step": "get_stored_message", "message": str(e)})
+                # print({"status": "error", "step": "get_stored_message", "message": str(e)})
+                raise ValueError({"status": "error", "step": "get_stored_message", "message": str(e)})
 
             # Build AI request
             single_ai_request = {
@@ -258,24 +264,103 @@ class AIRateLimiterService:
             return single_ai_request
 
         except requests.RequestException as e:
-            return f"Request to ai lambda failed: {e}"
+            # return f"Request to ai lambda failed: {e}"
+            raise ValueError(f"error in create_single_wp_ai_request: {e}")
         except Exception as e:
-            return f"An unexpected error occurred: {e}"
+            # return f"An unexpected error occurred: {e}"
+            raise ValueError(f"An unexpected error occurred: {e}")
         
         
         
 
+    # def send_ai_request(self, request_data, workspace_slug_id):
+    #     try:
+    #         url = f'{self.ai_rate_limiter_url}/message/publish'
+    #         max_retries = 4
+    #         base_timeout = 30  # Initial timeout in seconds
+    #         response = None
+
+    #         for attempt in range(1, max_retries + 1):
+    #             try:
+    #                 timeout = base_timeout * (2 ** (attempt - 1))  # Exponential timeout
+    #                 print(f"[Attempt {attempt}] Sending AI request with timeout {timeout}s...")
+
+    #                 response = requests.post(url, json=request_data, headers=self.headers, timeout=timeout)
+
+    #                 if response.status_code in [200, 201]:
+    #                     return response.json()
+
+    #                 # Handle specific "no worker" error
+    #                 error_data = {}
+    #                 try:
+    #                     error_data = response.json() if response.text else {}
+    #                 except ValueError:
+    #                     pass
+
+    #                 no_worker_error = (
+    #                     isinstance(error_data, dict) and (
+    #                         error_data.get("worker_required") is True or 
+    #                         "no worker available" in str(error_data.get("message", "")).lower()
+    #                     )
+    #                 )
+
+    #                 if no_worker_error and attempt == 1:
+    #                     print("No worker available, attempting to scale up...")
+    #                     scaled = self.ai_rate_limiter_service.scale_worker(str(workspace_slug_id))
+    #                     if scaled:
+    #                         print("Successfully initiated worker scale up")
+
+    #             except requests.RequestException as e:
+    #                 print(f"[Attempt {attempt}] RequestException: {e}")
+    #                 if attempt == max_retries:
+    #                     return {
+    #                         "success": False,
+    #                         "error": f"RequestException after {max_retries} attempts: {e}",
+    #                         "message_id": request_data.get("message_id")
+    #                     }
+
+    #             except Exception as e:
+    #                 print(f"[Attempt {attempt}] General Exception: {e}")
+    #                 if attempt == max_retries:
+    #                     return {
+    #                         "success": False,
+    #                         "error": f"Exception after {max_retries} attempts: {e}",
+    #                         "message_id": request_data.get("message_id")
+    #                     }
+
+    #             # Sleep before next retry (exponential delay)
+    #             sleep_time = 10 * attempt  # e.g., 10s, 20s, 30s, 40s
+    #             print(f"[Attempt {attempt}] Waiting {sleep_time}s before retry...")
+    #             time.sleep(sleep_time)
+
+    #         return {
+    #             "success": False,
+    #             "error": f"Failed after {max_retries} attempts, status: {response.status_code if response else 'No Response'}",
+    #             "message_id": request_data.get("message_id")
+    #         }
+
+    #     except Exception as e:
+    #         return {
+    #             "success": False,
+    #             "error": f"Unexpected outer error: {e}",
+    #             "message_id": request_data.get("message_id")
+    #         }
+
+
+
     def send_ai_request(self, request_data, workspace_slug_id):
         try:
-            
             url = f'{self.ai_rate_limiter_url}/message/publish'
-            max_retries = 2
+            max_retries = 4
+            base_timeout = 30  # Initial timeout in seconds
             response = None
 
             for attempt in range(1, max_retries + 1):
                 try:
-                    print(f"[Attempt {attempt}] Sending AI request...")
-                    response = requests.post(url, json=request_data, headers=self.headers, timeout=30)
+                    timeout = base_timeout * (2 ** (attempt - 1))  # Exponential timeout
+                    print(f"[Attempt {attempt}] Sending AI request with timeout {timeout}s...")
+
+                    response = requests.post(url, json=request_data, headers=self.headers, timeout=timeout)
 
                     if response.status_code in [200, 201]:
                         return response.json()
@@ -303,33 +388,26 @@ class AIRateLimiterService:
                 except requests.RequestException as e:
                     print(f"[Attempt {attempt}] RequestException: {e}")
                     if attempt == max_retries:
-                        return {
-                            "success": False,
-                            "error": f"RequestException after {max_retries} attempts: {e}",
-                            "message_id": request_data.get("message_id")
-                        }
+                        raise RuntimeError(f"RequestException after {max_retries} attempts: {e}")
 
                 except Exception as e:
                     print(f"[Attempt {attempt}] General Exception: {e}")
                     if attempt == max_retries:
-                        return {
-                            "success": False,
-                            "error": f"Exception after {max_retries} attempts: {e}",
-                            "message_id": request_data.get("message_id")
-                        }
+                        raise RuntimeError(f"Exception after {max_retries} attempts: {e}")
 
-            return {
-                "success": False,
-                "error": f"Failed after {max_retries} attempts, status: {response.status_code if response else 'No Response'}",
-                "message_id": request_data.get("message_id")
-            }
+                # Sleep before next retry (exponential delay)
+                sleep_time = 10 * attempt  # e.g., 10s, 20s, 30s, 40s
+                print(f"[Attempt {attempt}] Waiting {sleep_time}s before retry...")
+                time.sleep(sleep_time)
+
+            raise RuntimeError(
+                f"Failed after {max_retries} attempts, status: {response.status_code if response else 'No Response'}"
+            )
 
         except Exception as e:
-            return {
-                "success": False,
-                "error": f"Unexpected outer error: {e}",
-                "message_id": request_data.get("message_id")
-            }
+            raise RuntimeError(
+                f"Unexpected outer error: {e}"
+            )
 
 
 
@@ -372,14 +450,68 @@ class AIRateLimiterService:
 
         except Exception as e:
             print(f"[retry_failed_messages] Exception: {e}")
-            return {"success": False, "error": f"Unexpected error: {str(e)}"}
+            # return {"success": False, "error": f"Unexpected error: {str(e)}"}
+            raise ValueError({"success": False, "error": f"Unexpected error: {str(e)}"})
 
 
 
+    # def get_single_ai_response(self, message_id):
+    #     try:
+    #         max_retries = 3
+    #         delay_seconds = 30
+
+    #         for attempt in range(1, max_retries + 1):
+    #             try:
+    #                 url = f'{self.ai_rate_limiter_url}/message/{message_id}'
+    #                 response = requests.get(url, headers=self.headers)
+
+    #                 if response.status_code in [200, 201]:
+    #                     try:
+    #                         response_data = response.json()
+    #                     except ValueError:
+    #                         return {"message": {"error": "Invalid JSON response"}}
+
+    #                     if isinstance(response_data, dict):
+    #                         data_obj = {
+    #                             "message": response_data
+    #                         }
+
+    #                         status = response_data.get("ai_response_status")
+    #                         if status in ["pending", "processing"]:
+    #                             print(f"Attempt {attempt}: Response status '{status}'. Retrying after {delay_seconds} seconds...")
+    #                             if attempt < max_retries:
+    #                                 time.sleep(delay_seconds)
+    #                                 continue
+
+    #                         return data_obj
+
+    #                     else:
+    #                         return {"message": {"error": "Response is not a valid JSON object"}}
+
+    #                 else:
+    #                     print(f"Attempt {attempt}: Unexpected status code {response.status_code}")
+    #                     return {"message": {"error": f"Status code {response.status_code}"}}  
+
+    #             except requests.RequestException as e:
+    #                 print(f"Attempt {attempt}: Request failed: {e}")
+    #                 if attempt < max_retries:
+    #                     time.sleep(delay_seconds)
+
+    #             except Exception as e:
+    #                 print(f"Attempt {attempt}: Unexpected error: {e}")
+    #                 if attempt < max_retries:
+    #                     time.sleep(delay_seconds)
+
+    #         return {"message": {"error": "Max retries exceeded"}}
+
+    #     except Exception as e:
+    #         return {"message": {"error": f"Unexpected error: {str(e)}"}}
+    
+    
     def get_single_ai_response(self, message_id):
         try:
-            max_retries = 3
-            delay_seconds = 30
+            max_retries = 4
+            base_delay = 30  # Base delay in seconds
 
             for attempt in range(1, max_retries + 1):
                 try:
@@ -390,40 +522,41 @@ class AIRateLimiterService:
                         try:
                             response_data = response.json()
                         except ValueError:
-                            return {"message": {"error": "Invalid JSON response"}}
+                            # return {"message": {"error": "Invalid JSON response"}}
+                            raise ValueError({"message": {"error": "Invalid JSON response"}})
 
                         if isinstance(response_data, dict):
-                            data_obj = {
-                                "message": response_data
-                            }
-
+                            data_obj = {"message": response_data}
                             status = response_data.get("ai_response_status")
+
                             if status in ["pending", "processing"]:
-                                print(f"Attempt {attempt}: Response status '{status}'. Retrying after {delay_seconds} seconds...")
+                                print(f"Attempt {attempt}: Response status '{status}'. Retrying after {base_delay * attempt} seconds...")
                                 if attempt < max_retries:
-                                    time.sleep(delay_seconds)
+                                    time.sleep(base_delay * attempt)  # Increase delay per attempt
                                     continue
 
                             return data_obj
-
                         else:
-                            return {"message": {"error": "Response is not a valid JSON object"}}
+                            # return {"message": {"error": "Response is not a valid JSON object"}}
+                            raise ValueError({"message": {"error": "Response is not a valid JSON object"}})
 
                     else:
                         print(f"Attempt {attempt}: Unexpected status code {response.status_code}")
-                        return {"message": {"error": f"Status code {response.status_code}"}}  
+                        # return {"message": {"error": f"Status code {response.status_code}"}}  
+                        raise ValueError({"message": {"error": f"Status code {response.status_code}"}})
 
                 except requests.RequestException as e:
                     print(f"Attempt {attempt}: Request failed: {e}")
                     if attempt < max_retries:
-                        time.sleep(delay_seconds)
+                        time.sleep(base_delay * attempt)
 
                 except Exception as e:
                     print(f"Attempt {attempt}: Unexpected error: {e}")
                     if attempt < max_retries:
-                        time.sleep(delay_seconds)
+                        time.sleep(base_delay * attempt)
 
             return {"message": {"error": "Max retries exceeded"}}
 
         except Exception as e:
-            return {"message": {"error": f"Unexpected error: {str(e)}"}}
+            # return {"message": {"error": f"Unexpected error: {str(e)}"}}
+            raise ValueError({"message": {"error": f"Unexpected error: {str(e)}"}})

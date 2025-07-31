@@ -6,7 +6,7 @@ from app.workers.url_rewriter_para_response_helpers.ai_message_response_store im
 from app.workers.url_rewriter_para_response_helpers.get_all_stored_message import StoredMessageFetcher 
 from app.workers.url_rewriter_para_response_helpers.format_article_content import ArticleContentFormatter 
 from app.workers.url_rewriter_para_response_helpers.get_input_json_data import GetInputJson
-from app.workers.core.article_innovator_api_call.wordpress.fetch_category.fetch_category import FetchCategory
+# from app.workers.core.article_innovator_api_call.wordpress.fetch_category.fetch_category import FetchCategory
 from app.workers.core.article_innovator_api_call.wordpress.add_category.add_category import AddCategory
 from app.workers.core.article_innovator_api_call.fetch_supportive_prompt.fetch_supportive_prompt import FetchSupportivePrompt
 from app.workers.url_rewriter_para_response_helpers.create_wp_base_prompt import CreateWpBasePrompt
@@ -37,7 +37,7 @@ class UrlRewriterParallelWorker(BaseWorker):
         self.ai_message_request_store_service = AIMessageRequestStore()
         
         self.get_input_json_service = GetInputJson()
-        self.fetch_category_service = FetchCategory()
+        # self.fetch_category_service = FetchCategory()
         self.add_category_service = AddCategory()
         self.create_wp_base_prompt_service = CreateWpBasePrompt()
         self.publish_article_service = PublishArticle()

@@ -5,3 +5,7 @@ requests==2.32.3
 loguru==0.7.3
 beautifulsoup4>=4.12.2
 lxml>=4.9.3
+Pillow>=11.3.0
+# imagekitio==2.3.4
+imagekitio==1.2.2
+

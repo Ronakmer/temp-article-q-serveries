@@ -27,7 +27,7 @@ class AIMessage:
             message_id = str(data.get("message_id", "")).strip()
 
             if not article_id or not message_id:
-                return {"success": False, "error": "Missing article_id or message_id"}
+                raise ValueError({"success": False, "error": "Missing article_id or message_id"})
 
             request_data = {
                 "article_id": article_id,
@@ -68,7 +68,8 @@ class AIMessage:
 
         except Exception as e:
             print(f"[store_ai_message_request] Exception: {e}")
-            return {"success": False, "error": f"Unexpected error: {str(e)}"}
+            # return {"success": False, "error": f"Unexpected error: {str(e)}"}
+            raise ValueError({"success": False, "error": f"Unexpected error: {str(e)}"})
         
         
         
@@ -93,69 +94,140 @@ class AIMessage:
                 "success": False,
                 "message": "No message data found."
             }
+            # raise ValueError("No message data found.")
+
 
         except Exception as e:
             print(f"[get_stored_message] Exception: {e}")
-            return {
-                "success": False,
-                "message": str(e)
-            }
+            # return {
+            #     "success": False,
+            #     "message": str(e)
+            # }
+            raise ValueError(f"[get_stored_message] Exception: {e}")
 
 
 
-
-    # def store_ai_message_response(self, data):
+    # def store_ai_message_response(self, data, message_retry_count=3):
+    #     """
+    #     Store AI message response or trigger retry if ai_response_status indicates failure.
+    #     """
     #     try:
-    #         # print(data,'dataxxxxxxxxxx')
     #         message_data = data.get("message", {})
-            
     #         if not isinstance(message_data, dict):
-    #             return {"success": False, "error": "Invalid message data format"}
+    #             # return {"success": False, "error": "Invalid message data format"}
+    #             raise ValueError({"success": False, "error": "Invalid message data format"})
 
-
-    #         # Validate required IDs (ensure they are strings before strip)
+    #         # IDs
     #         article_id = str(message_data.get("article_id", "")).strip()
     #         message_id = str(message_data.get("message_id", "")).strip()
-    #         ai_response = message_data.get("ai_response", {})
-
     #         if not article_id or not message_id:
-    #             return {"success": False, "error": "Missing article_id or message_id"}
+    #             # return {"success": False, "error": "Missing article_id or message_id"}
+    #             raise ValueError({"success": False, "error": "Missing article_id or message_id"})
 
-    #         # Prepare payload for update (store full message as JSON string)
+    #         ai_response = message_data.get("ai_response", {})
+    #         ai_response_status = message_data.get("ai_response_status")
+    #         message_field_type = message_data.get("message_field_type")
+
+    #         # Helper: detect failure
+    #         def is_failure(status):
+    #             if status is False or status is None:
+    #                 return True
+    #             s = str(status).strip().lower()
+    #             return s in {"failed", "fail", "error", "false"}
+
+    #         # Prepare normal request payload
     #         request_data = {
     #             "article_id": article_id,
     #             "message_id": message_id,
     #             "article_message_count": message_data.get("article_message_count", 0),
-    #             "article_message_total_count": message_data.get("article_message_total_count", 0),  
-    #             # "ai_response": json.dumps(message_data),  # full message JSON as string
-    #             "ai_response": json.dumps(ai_response),  # full message JSON as string
-    #             "ai_response_status": message_data.get("ai_response_status"),
+    #             "article_message_total_count": message_data.get("article_message_total_count", 0),
+    #             "ai_response": json.dumps(ai_response),
+    #             "ai_response_status": ai_response_status,
     #         }
 
-    #         # Use combined IDs as item_id for the update call
     #         request_item_id = f"{article_id}/{message_id}"
 
+    #         # If AI response failed → schedule retry
+    #         if is_failure(ai_response_status):
+    #             # ✅ Get existing retry_count from DB
+    #             retry_count = 0
+    #             message_priority = 0
+    #             db_record = None
+    #             try:
+    #                 existing_data = self.get_ai_message(article_id, message_id)
+    #                 if existing_data.get("success") and existing_data["data"]:
+    #                     db_record = existing_data["data"][0]  # Assuming data is a list
+    #                     retry_count = int(db_record.get("retry_count", 0))
+    #                     message_priority = int(db_record.get("message_priority", 0))
+    #             except Exception as e:
+    #                 # print(f"[store_ai_message_response] Error fetching retry_count: {e}")
+    #                 raise ValueError(f"[store_ai_message_response] Error fetching retry_count: {e}")
+
+    #             # ✅ Increment retry count
+    #             retry_count += 1
+    #             base_priority = self.calculate_priority_service.extract_base_priority(message_priority, message_field_type)
+    #             priority = self.calculate_priority_service.calculate_priority(base_priority, f'retry_{message_field_type}')
+
+    #             if retry_count > message_retry_count:
+    #                 return {
+    #                     "success": False,
+    #                     "error": f"Retry limit reached ({message_retry_count})",
+    #                     "retry_count": retry_count
+    #                 }
+
+    #             retry_payload = {
+    #                 "article_id": article_id,
+    #                 "message_id": message_id,
+    #                 "ai_request_status": "retry",
+    #                 "retry_count": retry_count,
+    #                 "message_priority": priority,
+
+    #             }
+
+    #             # Update DB with retry status
+    #             try:
+    #                 resp_retry = self.api_client.crud(
+    #                     "ai-message",
+    #                     "update",
+    #                     data=retry_payload,
+    #                     item_id=request_item_id
+    #                 )
+    #             except Exception as e:
+    #                 print(f"[store_ai_message_response] Retry status update exception: {e}")
+    #                 resp_retry = {"status_code": None, "error": str(e)}
+
+    #             # Call retry_message method (adjust args as needed)
+    #             try:
+    #                 from app.workers.url_rewriter_content_helpers.ai_rate_limiter_request import AIRateLimiterService
+    #                 self.retry_failed_messages_service = AIRateLimiterService()
+
+    #                 self.retry_failed_messages_service.retry_failed_messages(resp_retry=resp_retry)
+    #             except Exception as e:
+    #                 print(f"[store_ai_message_response] retry_message exception: {e}")
+
+    #             return {
+    #                 "success": False,
+    #                 "error": "AI response failed; retry scheduled.",
+    #                 "retry_count": retry_count,
+    #                 "retry_update_response": resp_retry,
+    #             }
+
+    #         # Normal flow: store AI response
     #         max_retries = 3
     #         stored_message = None
-
     #         for attempt in range(1, max_retries + 1):
     #             stored_message = self.api_client.crud(
-    #                 'ai-message',
-    #                 'update',
+    #                 "ai-message",
+    #                 "update",
     #                 data=request_data,
     #                 item_id=request_item_id
     #             )
-
-
-    #             # print(f"[store_ai_message_response] Attempt {attempt}, Response: {stored_message}")
-                
-    #             if stored_message.get('status_code') == 200:
-                    
+    #             if stored_message.get("status_code") == 200:
     #                 return stored_message
     #             else:
     #                 print(f"[store_ai_message_response] Attempt {attempt} failed with status_code {stored_message.get('status_code')}. Retrying...")
 
-    #         # All retries failed
+    #         # All attempts failed
     #         return {
     #             "success": False,
     #             "error": f"Failed to update after {max_retries} attempts",
@@ -168,35 +240,31 @@ class AIMessage:
 
 
 
-
-
     def store_ai_message_response(self, data, message_retry_count=3):
         """
         Store AI message response or trigger retry if ai_response_status indicates failure.
+        Raises ValueError or RuntimeError on error conditions.
         """
         try:
             message_data = data.get("message", {})
             if not isinstance(message_data, dict):
-                return {"success": False, "error": "Invalid message data format"}
+                raise ValueError("Invalid message data format")
 
-            # IDs
             article_id = str(message_data.get("article_id", "")).strip()
             message_id = str(message_data.get("message_id", "")).strip()
             if not article_id or not message_id:
-                return {"success": False, "error": "Missing article_id or message_id"}
+                raise ValueError("Missing article_id or message_id")
 
             ai_response = message_data.get("ai_response", {})
             ai_response_status = message_data.get("ai_response_status")
             message_field_type = message_data.get("message_field_type")
 
-            # Helper: detect failure
             def is_failure(status):
                 if status is False or status is None:
                     return True
                 s = str(status).strip().lower()
                 return s in {"failed", "fail", "error", "false"}
 
-            # Prepare normal request payload
             request_data = {
                 "article_id": article_id,
                 "message_id": message_id,
@@ -208,32 +276,24 @@ class AIMessage:
 
             request_item_id = f"{article_id}/{message_id}"
 
-            # If AI response failed → schedule retry
             if is_failure(ai_response_status):
-                # ✅ Get existing retry_count from DB
                 retry_count = 0
                 message_priority = 0
-                db_record = None
                 try:
                     existing_data = self.get_ai_message(article_id, message_id)
                     if existing_data.get("success") and existing_data["data"]:
-                        db_record = existing_data["data"][0]  # Assuming data is a list
+                        db_record = existing_data["data"][0]
                         retry_count = int(db_record.get("retry_count", 0))
                         message_priority = int(db_record.get("message_priority", 0))
                 except Exception as e:
-                    print(f"[store_ai_message_response] Error fetching retry_count: {e}")
+                    raise RuntimeError(f"[store_ai_message_response] Error fetching retry_count: {e}")
 
-                # ✅ Increment retry count
                 retry_count += 1
                 base_priority = self.calculate_priority_service.extract_base_priority(message_priority, message_field_type)
                 priority = self.calculate_priority_service.calculate_priority(base_priority, f'retry_{message_field_type}')
 
                 if retry_count > message_retry_count:
-                    return {
-                        "success": False,
-                        "error": f"Retry limit reached ({message_retry_count})",
-                        "retry_count": retry_count
-                    }
+                    raise RuntimeError(f"Retry limit reached ({message_retry_count})")
 
                 retry_payload = {
                     "article_id": article_id,
@@ -241,10 +301,8 @@ class AIMessage:
                     "ai_request_status": "retry",
                     "retry_count": retry_count,
                     "message_priority": priority,
-
                 }
 
-                # Update DB with retry status
                 try:
                     resp_retry = self.api_client.crud(
                         "ai-message",
@@ -253,28 +311,19 @@ class AIMessage:
                         item_id=request_item_id
                     )
                 except Exception as e:
-                    print(f"[store_ai_message_response] Retry status update exception: {e}")
-                    resp_retry = {"status_code": None, "error": str(e)}
+                    raise RuntimeError(f"[store_ai_message_response] Retry status update exception: {e}")
 
-                # Call retry_message method (adjust args as needed)
                 try:
                     from app.workers.url_rewriter_content_helpers.ai_rate_limiter_request import AIRateLimiterService
                     self.retry_failed_messages_service = AIRateLimiterService()
-
                     self.retry_failed_messages_service.retry_failed_messages(resp_retry=resp_retry)
                 except Exception as e:
-                    print(f"[store_ai_message_response] retry_message exception: {e}")
+                    raise RuntimeError(f"[store_ai_message_response] retry_message exception: {e}")
 
-                return {
-                    "success": False,
-                    "error": "AI response failed; retry scheduled.",
-                    "retry_count": retry_count,
-                    "retry_update_response": resp_retry,
-                }
+                raise RuntimeError(f"AI response failed; retry scheduled. Retry count: {retry_count}")
 
             # Normal flow: store AI response
             max_retries = 3
-            stored_message = None
             for attempt in range(1, max_retries + 1):
                 stored_message = self.api_client.crud(
                     "ai-message",
@@ -284,20 +333,13 @@ class AIMessage:
                 )
                 if stored_message.get("status_code") == 200:
                     return stored_message
-                else:
-                    print(f"[store_ai_message_response] Attempt {attempt} failed with status_code {stored_message.get('status_code')}. Retrying...")
+                print(f"[store_ai_message_response] Attempt {attempt} failed. Retrying...")
 
-            # All attempts failed
-            return {
-                "success": False,
-                "error": f"Failed to update after {max_retries} attempts",
-                "last_response": stored_message,
-            }
+            raise RuntimeError(f"Failed to update after {max_retries} attempts")
 
         except Exception as e:
             print(f"[store_ai_message_response] Exception: {e}")
-            return {"success": False, "error": f"Unexpected error: {str(e)}"}
-
+            raise  # Reraise the last caught exception
 
 
 
@@ -324,7 +366,8 @@ class AIMessage:
 
         except Exception as e:
             print(f"[get_all_stored_message] Exception: {e}")
-            return {"success": False, "error": f"Unexpected error: {str(e)}"}
+            # return {"success": False, "error": f"Unexpected error: {str(e)}"}
+            raise ValueError({"success": False, "error": f"Unexpected error: {str(e)}"})
 
 
 
@@ -347,17 +390,20 @@ class AIMessage:
                     "data": message_data["data"]
                 }
 
-            return {
-                "success": False,
-                "message": "No message data found."
-            }
+            # return {
+            #     "success": False,
+            #     "message": "No message data found."
+            # }
+
+            raise ValueError("No message data found.")
 
         except Exception as e:
             print(f"[get_stored_message] Exception: {e}")
-            return {
-                "success": False,
-                "message": str(e)
-            }
+            # return {
+            #     "success": False,
+            #     "message": str(e)
+            # }
+            raise ValueError(f"[get_stored_message] Exception: {e}")
             
             
     
@@ -366,7 +412,8 @@ class AIMessage:
             message_data = request_data.get("message", {})
             
             if not isinstance(message_data, dict):
-                return {"success": False, "error": "Invalid message data format"}
+                # return {"success": False, "error": "Invalid message data format"}
+                raise ValueError({"success": False, "error": "Invalid message data format"})
 
             # Validate required IDs (ensure they are strings before strip)
             article_id = str(message_data.get("article_id", "")).strip()
@@ -385,7 +432,8 @@ class AIMessage:
 
         except Exception as e:
             print(f"[get_input_json_data] Exception: {e}")
-            return {"success": False, "error": f"Unexpected error: {str(e)}"}
+            # return {"success": False, "error": f"Unexpected error: {str(e)}"}
+            raise ValueError({"success": False, "error": f"Unexpected error: {str(e)}"})
 
 
 
@@ -414,6 +462,42 @@ class AIMessage:
                     "data": successful_messages
                 }
 
-            return {"success": False, "message": "No data found"}
+            # return {"success": False, "message": "No data found"}
+            raise ValueError({"success": False, "message": "No data found"})
         except Exception as e:
-            return {"success": False, "message": str(e)}
+            # return {"success": False, "message": str(e)}
+            raise ValueError({"success": False, "message": str(e)})
+
+
+    def get_all_stored_message(self, article_id):
+        try:
+            params = {
+                'article_slug_id': article_id,
+            }
+
+            response = self.api_client.crud('ai-message', 'read', params=params)
+
+            if response.get("success") and isinstance(response.get("data"), list):
+                all_messages = response["data"]
+                successful_messages = [m for m in all_messages if m.get("ai_response_status") == "success"]
+
+                # Save all messages to file
+                os.makedirs('demo_json', exist_ok=True)
+                with open('demo_json/final_all_message_data.json', 'w', encoding='utf-8') as f:
+                    json.dump(response, f, indent=4)
+
+                # ✅ Check if all messages are successful
+                all_success = len(all_messages) > 0 and len(successful_messages) == len(all_messages)
+
+                return {
+                    "success": True,
+                    "total_messages": len(all_messages),
+                    "total_successful_messages": len(successful_messages),
+                    "all_success": all_success,
+                    "data": successful_messages
+                }
+
+            # return {"success": False, "message": "No data found"}
+            raise ValueError({"success": False, "message": "No data found"})
+        except Exception as e:
+            raise ValueError({"success": False, "message": str(e)})

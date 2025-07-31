@@ -1,9 +1,0 @@
-2025-07-09 03:39:24 | INFO | Initializing url_rewriter_para_request_worker worker with PID 46
-2025-07-09 03:39:24 | INFO | Successfully connected on attempt 1
-2025-07-09 03:39:24 | INFO | url_rewriter_para_request_worker initialized and ready to process messages
-2025-07-09 10:44:41 | INFO | Initializing url_rewriter_para_response_worker worker with PID 46
-2025-07-09 10:44:41 | INFO | Successfully connected on attempt 1
-2025-07-09 10:44:41 | INFO | url_rewriter_para_response_worker initialized and ready to process messages
-2025-07-09 11:23:30 | INFO | Initializing url_rewriter_para_response_worker worker with PID 46
-2025-07-09 11:23:30 | INFO | Successfully connected on attempt 1
-2025-07-09 11:23:30 | INFO | url_rewriter_para_response_worker initialized and ready to process messages

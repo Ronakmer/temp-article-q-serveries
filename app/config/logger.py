@@ -1,3 +1,5 @@
+
+
 from loguru import logger
 import os
 import sys
@@ -66,3 +68,94 @@ class LoggerSetup:
 # logger_setup = LoggerSetup()
 # app_logger = logger_setup.setup_logger()
 # worker_logger = logger_setup.setup_worker_logger(pid=1234)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# from loguru import logger
+# import os
+# import sys
+# from datetime import datetime
+# from dotenv import load_dotenv
+
+# load_dotenv()
+
+# class LoggerSetup:
+#     def __init__(self):
+#         self.base_log_dir = os.getenv("LOG_DIR", "app/static/logs/workers")
+#         # Create base log directory if it doesn't exist
+#         os.makedirs(self.base_log_dir, exist_ok=True)
+
+#     def setup_logger(self):
+#         """Setup the main logger with console and file handlers."""
+#         # Remove default logger
+#         logger.remove()
+
+#         # Add console logger
+#         logger.add(sys.stdout, level="INFO")
+
+#         # Add file logger for all logs directly in the workers folder
+#         logger.add(
+#             f"{self.base_log_dir}/app.log",
+#             rotation="1 day",
+#             retention="1 week",
+#             format="{time:YYYY-MM-DD HH:mm:ss} | {level} | PID:{process} | {message}",
+#             level="INFO",
+#             enqueue=True,
+#             delay=True,
+#             mode="a",
+#             backtrace=True,
+#             diagnose=True,
+#             catch=True
+#         )
+
+#         return logger
+
+#     def setup_worker_logger(self, pid=None):
+#         """Setup worker-specific logger."""
+#         # Remove default logger
+#         logger.remove()
+
+#         # Add console logger
+#         logger.add(sys.stdout, level="INFO")
+
+#         # Create log filename based on PID
+#         log_filename = f"worker_{pid}.log" if pid else "worker.log"
+
+#         # Configure logger with PID-specific file directly in workers folder
+#         logger.add(
+#             f"{self.base_log_dir}/{log_filename}",
+#             rotation="1 day",
+#             retention="1 week",
+#             format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}",
+#             level="INFO",
+#             enqueue=True,
+#             delay=True,
+#             mode="a",
+#             backtrace=True,
+#             diagnose=True,
+#             catch=True
+#         )
+
+#         return logger
+
+# # Remove these lines as they cause issues
+# # logger_setup = LoggerSetup()
+# # app_logger = logger_setup.setup_logger()
+# # worker_logger = logger_setup.setup_worker_logger(pid=1234)
+

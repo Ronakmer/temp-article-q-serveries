@@ -36,7 +36,7 @@ class FetchBasePromptData:
             }
 
         except Exception as e:
-            return {"error": f"An unexpected error occurred: {str(e)}"}
+            raise ValueError(f"An unexpected error occurred in fetch_base_prompt_data: {e}")
 
 
 
