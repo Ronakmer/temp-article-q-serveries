@@ -534,6 +534,10 @@ class AIRateLimiterService:
                                 if attempt < max_retries:
                                     time.sleep(base_delay * attempt)  # Increase delay per attempt
                                     continue
+                                else:
+                                    # Raise error if final status is still "padding"
+                                    raise ValueError({"message": {"error": f"Final status is '{status}' after {max_retries} retries"}})
+
 
                             return data_obj
                         else:

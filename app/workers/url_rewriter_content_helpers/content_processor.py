@@ -3,7 +3,7 @@ import uuid
 import time
 import json
 import requests
-
+import os
 
 class ContentProcessor:
 
@@ -49,6 +49,8 @@ class ContentProcessor:
                 if item["name"] == "source_content":
                     item["value"] = self.clean_html(item["value"])
 
+            
+            os.makedirs('demo_json', exist_ok=True)
             # Save cleaned JSON to file
             with open('demo_json/content_response.json', 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=4)

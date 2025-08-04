@@ -263,7 +263,7 @@ class AIMessage:
                 if status is False or status is None:
                     return True
                 s = str(status).strip().lower()
-                return s in {"failed", "fail", "error", "false"}
+                return s in {"failed", "fail", "error", "false", "padding"}
 
             request_data = {
                 "article_id": article_id,
